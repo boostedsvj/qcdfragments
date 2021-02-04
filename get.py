@@ -101,11 +101,23 @@ def main():
         '/QCD_Pt_3200toInf_TuneCP5_13TeV_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM',
         ]
 
-    sh_lines = []
+    curls = []
+    drivers = []
+
     for dataset in datasets:
-        sh_lines.append('# ' + dataset)
         curl_cmd, driver_cmd = get_driver_cmd(dataset)
-        sh_lines.extend([curl_cmd, driver_cmd, ''])
+        curls.append(curl_cmd)
+        drivers.append(driver_cmd)
+
+    sh_lines = []
+
+    for dataset, curl in zip(datasets, curls):
+        sh_lines.extend(['# ' + dataset, curl, ''])
+
+    sh_lines.extend(['scram b', ''])
+
+    for dataset, driver in zip(datasets, drivers):
+        sh_lines.extend(['# ' + dataset, driver, ''])
 
     with open('download_fragments.sh', 'w') as f:
         f.write('\n'.join(sh_lines))
