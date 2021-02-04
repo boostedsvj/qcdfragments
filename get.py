@@ -65,16 +65,16 @@ def get_driver_cmd(dataset, s=None):
     setup_sh = r.text
     logger.info('Retrieved:\n%s ... %s', setup_sh[:20], setup_sh[-20:])
 
-    print(setup_sh)
-
     match = re.search(r'^cmsDriver\.py.*?$', setup_sh, flags=re.MULTILINE)
     if not match:
         raise Exception('Could not find a cmsDriver command!')
     driver_cmd = match.group()
-    logger.info('Retrieved driver cmd: %s', driver_cmd)
 
     # Fix the driver command to yield GEN instead of SIM
     driver_cmd = driver_cmd.replace('--step GEN,SIM', '--step GEN')
+    driver_cmd = driver_cmd.replace(' || exit $? ;', '')
+    driver_cmd = driver_cmd.replace('$EVENTS', '100')
+    logger.info('Retrieved driver cmd: %s', driver_cmd)
 
     match = re.search(r'^curl.*?$', setup_sh, flags=re.MULTILINE)
     if not match:
